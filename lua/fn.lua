@@ -1,6 +1,5 @@
 -- Utilities for functional programming
 
-fn = {
+return {
 }
-return fn
 

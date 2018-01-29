@@ -10,7 +10,6 @@ local function itr_foldl(f, a, b)
   end
 end
 
-itr = {
+return {
   foldl = itr
 }
-return itr

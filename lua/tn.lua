@@ -13,8 +13,7 @@ local function tn_itr(t)
   end
 end
 
-tn = {
-  itr = tn_itr
+return {
+  itr = tn_itr,
 }
-return tn
 
