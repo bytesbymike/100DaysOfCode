@@ -13,7 +13,18 @@ local function tn_itr(t)
   end
 end
 
+local function tn_pack(...)
+  local t = table.pack(...)
+  return t
+end
+
+local function tn_unpack(t)
+  return table.unpack(t, 1, t.n)
+end
+
 return {
   itr = tn_itr,
+  pack = tn_pack
+  unpack = tn_unpack
 }
 
