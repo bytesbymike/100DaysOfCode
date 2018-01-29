@@ -1,6 +1,6 @@
 # 100DaysOfCode #
 
-## Round 1 2018-01-29 ##
+## Round 1 - 2018-01-29 ##
 I plan to use my first 100 days of code to learn:
   - Lua
   - Forth
