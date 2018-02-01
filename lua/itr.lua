@@ -11,5 +11,5 @@ local function itr_foldl(f, a, b)
 end
 
 return {
-  foldl = itr
+  foldl = itr_foldl,
 }
