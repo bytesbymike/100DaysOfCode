@@ -10,6 +10,20 @@ local function itr_foldl(f, acc, itr)
   end
 end
 
+
+local function itr_of_tn(t)
+  local i = 0
+  return function ()
+    i = i + 1
+    if t.n < i then
+      return nil
+    else
+      return i, t[i]
+    end
+  end
+end
+
 return {
   foldl = itr_foldl,
+  of_tn = itr_of_tn,
 }
