@@ -1,8 +1,133 @@
 -- Utilities for functional programming
 
-local function fn_identity(...) return ... end
+local itr = require("itr")
+local tn = require("tn")
+local seq = require("seq")
+
+local _curry_thunk
+local _curry_impl
+
+_curry_thunk = function (f, n, args0)
+  return function (...)
+    local args1 = tn.cat(args0, tn.pack(...))
+    return _curry_args(f, n, args1)
+  end
+end
+
+_curry_args = function (f, n, args)
+  if args.n < n then
+    return _curry_thunk(f, n, args)
+  else
+    return f(tn.unpack(args))
+  end
+end
+
+local function _curryn(f, n)
+  return _curry_thunk(f, n, tn.pack())
+end
+
+local function _identity(...) return ... end
+
+local _add = _curryn(function (a, b) return a + b end, 2)
+local _inc = _add(1)
+local _dec = _add(-1)
+local _mul = _curryn(function (a, b) return a * b end, 2)
+
+-- `if` as a function
+local function _fif(bool_val, true_val, false_val)
+  if bool_val then
+    return true_val
+  else
+    return false_val
+  end
+end
+
+local function _range_next(n_offset, i0)
+  local i1 = i0 + 1
+  local v = i1 + n_offset[2]
+  return itr.fnext_vals(_fif(i1 > n_offset[1], nil, i1), v)
+end
+
+local function _range(a, b)
+  local offset = a - 1
+  local n = b - offset
+  return _range_next, {n,offset}, 0
+end
+
+-- fnext(invariant, stprev) -> stnext, vals
+local function _eager_foldl(f, acc, fnext, invariant, stprev)
+  local stnext, vals = itr.fnext_vals(fnext(invariant, stprev))
+  if stnext == nil then
+    return acc
+  else
+    local fval = (f(acc, vals)) -- adjust to 1
+    return _eager_foldl(f, fval, fnext, invariant, stnext)
+  end
+end
+
+_foldl = _curryn(_eager_foldl, 5)
+
+local function _map_create_fnext2(f, fnext)
+  local function _fnext2(invariant, stprev)
+    local stnext, vals = itr.fnext_vals(fnext(invariant, stprev))
+    if stnext == nil then
+      return nil
+    else
+      return stnext, f(vals)
+    end
+  end
+  return _fnext2
+end
+
+local function _map(f, fnext, invariant, stprev)
+  return _map_create_fnext2(f, fnext), invariant, stprev
+end
+
+local function _filter_create_fnext(f, fnext)
+  local function _fnext2(invariant, stprev)
+    local stnext, vals = itr.fnext_vals(fnext(invariant, stprev))
+    if stnext == nil then
+      return nil
+    else
+      if f(vals) == false then
+        return _fnext2(invariant, stnext)
+      else
+        return stnext, vals
+      end
+    end
+  end
+  return _fnext2
+end
+
+local function _filter(f, fnext, invariant, stprev)
+  return _filter_create_fnext(f, fnext), invariant, stprev
+end
+
+local function _compose2(f, g)
+  return function(...) return f(g(...)) end
+end
+
+local function _compose(f, ...)
+  if select("#", ...) > 0 then
+    g = _compose(...)
+    return _compose2(f, g)
+  else
+    return f
+  end
+end
 
 return {
-  identity = fn_identity,
+  add = _add,
+  curryn = _curryn,
+  compose = _compose,
+  dec = _dec,
+  fif = _fif,
+  filter = _filter,
+  foldl = _foldl,
+  identity = _identity,
+  inc = _inc,
+  map = _map,
+  mul = _mul,
+  range = _range,
 }
 
