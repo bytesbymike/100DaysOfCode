@@ -2,7 +2,6 @@
 
 local itr = require("itr")
 local tn = require("tn")
-local seq = require("seq")
 
 local _curry_thunk
 local _curry_impl
