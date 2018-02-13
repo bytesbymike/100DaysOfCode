@@ -3,10 +3,10 @@
 local itr = require("itr")
 local tn = require("tn")
 
-local _curry_thunk
+local _curry_partial
 local _curry_impl
 
-_curry_thunk = function (f, n, args0)
+_curry_partial = function (f, n, args0)
   return function (...)
     local args1 = tn.cat(args0, tn.pack(...))
     return _curry_args(f, n, args1)
@@ -15,14 +15,14 @@ end
 
 _curry_args = function (f, n, args)
   if args.n < n then
-    return _curry_thunk(f, n, args)
+    return _curry_partial(f, n, args)
   else
     return f(tn.unpack(args))
   end
 end
 
 local function _curryn(f, n)
-  return _curry_thunk(f, n, tn.pack())
+  return _curry_partial(f, n, tn.pack())
 end
 
 local function _identity(...) return ... end
