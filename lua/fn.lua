@@ -6,31 +6,31 @@ local tn = require("tn")
 local _curry_partial
 local _curry_impl
 
-_curry_partial = function (f, n, args0)
+_curry_partial = function (n, f, args0)
   return function (...)
     local args1 = tn.cat(args0, tn.pack(...))
-    return _curry_args(f, n, args1)
+    return _curry_args(n, f, args1)
   end
 end
 
-_curry_args = function (f, n, args)
+_curry_args = function (n, f, args)
   if args.n < n then
-    return _curry_partial(f, n, args)
+    return _curry_partial(n, f, args)
   else
     return f(tn.unpack(args))
   end
 end
 
-local function _curryn(f, n)
-  return _curry_partial(f, n, tn.pack())
+local function _curryn(n, f)
+  return _curry_partial(n, f, tn.pack())
 end
 
 local function _identity(...) return ... end
 
-local _add = _curryn(function (a, b) return a + b end, 2)
+local _add = _curryn(2, function (a, b) return a + b end)
 local _inc = _add(1)
 local _dec = _add(-1)
-local _mul = _curryn(function (a, b) return a * b end, 2)
+local _mul = _curryn(2, function (a, b) return a * b end)
 
 -- `if` as a function
 local function _fif(bool_val, true_val, false_val)
@@ -64,7 +64,7 @@ local function _eager_foldl(f, acc, fnext, invariant, stprev)
   end
 end
 
-_foldl = _curryn(_eager_foldl, 5)
+_foldl = _curryn(_5, eager_foldl)
 
 local function _map_create_fnext2(f, fnext)
   local function _fnext2(invariant, stprev)
