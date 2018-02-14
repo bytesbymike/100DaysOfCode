@@ -3,6 +3,19 @@
 local itr = require("itr")
 local tn = require("tn")
 
+local function _compose2(f, g)
+  return function(...) return f(g(...)) end
+end
+
+local function _compose(f, g, ...)
+  local fg = _compose2(f, g)
+  if select("#", ...) == 0 then
+    return fg
+  else
+    return _compose(fg, ...)
+  end
+end
+
 local _curry_partial
 local _curry_impl
 
@@ -100,19 +113,6 @@ end
 
 local function _filter(f, fnext, invariant, stprev)
   return _filter_create_fnext(f, fnext), invariant, stprev
-end
-
-local function _compose2(f, g)
-  return function(...) return f(g(...)) end
-end
-
-local function _compose(f, g, ...)
-  local fg = _compose2(f, g)
-  if select("#", ...) == 0 then
-    return fg
-  else
-    return _compose(fg, ...)
-  end
 end
 
 return {
