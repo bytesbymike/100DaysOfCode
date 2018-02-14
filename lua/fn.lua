@@ -106,12 +106,12 @@ local function _compose2(f, g)
   return function(...) return f(g(...)) end
 end
 
-local function _compose(f, ...)
-  if select("#", ...) > 0 then
-    g = _compose(...)
-    return _compose2(f, g)
+local function _compose(f, g, ...)
+  local fg = _compose2(f, g)
+  if select("#", ...) == 0 then
+    return fg
   else
-    return f
+    return _compose(fg, ...)
   end
 end
 
